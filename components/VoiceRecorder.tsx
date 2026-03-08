@@ -5,7 +5,7 @@
  * Sends recorded audio to /api/transcribe for speech-to-text via Gemini
  */
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { parseApiErrorBody } from "@/lib/error-utils";
 
 interface VoiceRecorderProps {
@@ -20,12 +20,23 @@ export default function VoiceRecorder({
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [micAvailable, setMicAvailable] = useState<boolean | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+
+  useEffect(() => {
+    setMicAvailable(!!navigator.mediaDevices?.getUserMedia);
+  }, []);
   const chunksRef = useRef<Blob[]>([]);
 
   const startRecording = useCallback(async () => {
     try {
       setError(null);
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setError(
+          "Microphone not available. Use HTTPS or localhost, or type your idea in the text area below."
+        );
+        return;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
@@ -42,8 +53,17 @@ export default function VoiceRecorder({
       mediaRecorder.start();
       setIsRecording(true);
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const isSecureContext =
+        msg.includes("secure") ||
+        msg.includes("HTTPS") ||
+        msg.includes("localhost");
       setError(
-        err instanceof Error ? err.message : "Failed to access microphone"
+        isSecureContext
+          ? "Microphone requires HTTPS or localhost. Type your idea in the text area below."
+          : msg.length > 100
+            ? "Microphone access failed. Type your idea in the text area below."
+            : msg
       );
     }
   }, []);
@@ -107,7 +127,7 @@ export default function VoiceRecorder({
         <button
           type="button"
           onClick={handleToggle}
-          disabled={disabled || isTranscribing}
+          disabled={disabled || isTranscribing || micAvailable === false}
           className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${
             isRecording
               ? "animate-pulse bg-red-500 text-white hover:bg-red-600"
@@ -141,9 +161,16 @@ export default function VoiceRecorder({
             ? "Recording... Click to stop"
             : isTranscribing
               ? "Transcribing..."
-              : "Record your idea"}
+              : micAvailable === false
+                ? "Mic unavailable — type your idea below"
+                : "Record your idea"}
         </span>
       </div>
+      {micAvailable === false && !error && (
+        <p className="text-xs text-amber-600 dark:text-amber-400">
+          Voice recording needs HTTPS or localhost. Type your idea in the text area below.
+        </p>
+      )}
       {error && (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
