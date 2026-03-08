@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VoicePrompt Studio
 
-## Getting Started
+**Voice in, shoot plan out.** Record your idea, add context — get a full production plan with shot lists, camera angles, full script, and a shoot-day checklist. Built for directors, line producers, and content creators. Powered by **Gemini 3.1 Pro**.
 
-First, run the development server:
+![VoicePrompt Studio](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![Gemini](https://img.shields.io/badge/Gemini-3.1%20Pro-blue?logo=google)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+
+- **Voice recording** — Record or type your idea. Transcribed via Gemini (requires HTTPS or localhost).
+- **Shoot plan** — 4 production-ready scenes with shot type, camera angle, action, dialogue, notes.
+- **References & trends** — AI suggests trending examples and breakdown to inform your plan.
+- **Full script** — Production-ready script adjoining the shot plan.
+- **Shoot day bible** — Props, people, permissions, safety, schedule, weather, budget. Tick off as you go.
+- **Version control** — Save plans, edit (schedule, weather, scene notes), save as new version.
+- **Print** — One-click print for on-set use.
+- **Multi-provider** — Switch between Gemini, GPT, Claude when quota hits.
+
+## Quick Start
+
+1. **Clone and install**
+
+   ```bash
+   git clone https://github.com/CBhavya/CBhavya.git
+   cd human-agent-dashboard  # or your repo folder
+   npm install
+   ```
+
+2. **Set up API keys**
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Edit `.env.local`:
+
+   ```
+   GEMINI_API_KEY=your_key          # Required (voice + storyboard)
+   OPENAI_API_KEY=sk-...            # Optional (switch to GPT)
+   ANTHROPIC_API_KEY=sk-ant-...     # Optional (switch to Claude)
+   ```
+
+3. **Run**
+
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000)
+
+## Demo
+
+- **Load demo idea** — Pre-fills a fitness app teaser prompt.
+- **Load demo plan (no API)** — Full shoot plan without API calls (use when quota is exhausted).
+- **Generate Shoot Plan** — Creates recommendations, references, script, checklist, and shot cards.
+
+## Project Structure
+
+```
+app/
+  page.tsx                 # Main UI
+  api/
+    storyboard/route.ts     # Shoot plan generation
+    transcribe/route.ts     # Audio → text
+    providers/route.ts      # Available AI providers
+components/
+  VoiceRecorder.tsx        # MediaRecorder + transcription
+  PromptForm.tsx           # Reference, tone, provider, generate
+  StoryboardViewer.tsx     # Recommendations, script, bible, shot cards
+lib/
+  ai-providers.ts          # Gemini, OpenAI, Anthropic abstraction
+  gemini.ts                # Gemini client, transcription, images
+  demo-plan.ts             # Demo data (no API)
+  saved-plans.ts           # Versioned plans (localStorage)
+  error-utils.ts           # User-friendly error handling
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+[Vercel](https://vercel.com) (recommended):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Push to GitHub.
+2. Import repo at [vercel.com/new](https://vercel.com/new).
+3. Add env vars: `GEMINI_API_KEY` (and optionally `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`).
+4. Deploy.
 
-## Learn More
+## Hackathon
 
-To learn more about Next.js, take a look at the following resources:
+Built for Google DeepMind hackathon. Uses **Gemini 3.1 Pro** for shoot recommendations, scenes, script, production checklist, and reference inspiration.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
