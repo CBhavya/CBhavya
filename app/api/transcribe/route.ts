@@ -5,6 +5,7 @@
  */
 
 import { NextResponse } from "next/server";
+import { normalizeApiError } from "@/lib/error-utils";
 import { transcribeAudio } from "@/lib/gemini";
 
 export async function POST(request: Request) {
@@ -30,8 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ transcript });
   } catch (error) {
     console.error("Transcribe API error:", error);
-    const message =
-      error instanceof Error ? error.message : "Failed to transcribe audio";
+    const message = normalizeApiError(error, "Failed to transcribe audio");
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

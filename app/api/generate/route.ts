@@ -5,6 +5,7 @@
  */
 
 import { NextResponse } from "next/server";
+import { normalizeApiError } from "@/lib/error-utils";
 import { generateContent } from "@/lib/gemini";
 
 export async function POST(request: Request) {
@@ -45,8 +46,7 @@ ${prompt}`;
     });
   } catch (error) {
     console.error("Generate API error:", error);
-    const message =
-      error instanceof Error ? error.message : "Failed to generate content";
+    const message = normalizeApiError(error, "Failed to generate content");
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

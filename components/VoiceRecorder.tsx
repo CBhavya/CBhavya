@@ -6,6 +6,7 @@
  */
 
 import { useState, useRef, useCallback } from "react";
+import { parseApiErrorBody } from "@/lib/error-utils";
 
 interface VoiceRecorderProps {
   onTranscript: (transcript: string) => void;
@@ -80,14 +81,13 @@ export default function VoiceRecorder({
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Transcription failed");
+        throw new Error(parseApiErrorBody(data) || "Transcription failed");
       }
 
       onTranscript(data.transcript || "");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to transcribe audio"
-      );
+      const msg = err instanceof Error ? err.message : "Failed to transcribe audio";
+      setError(msg.length > 300 ? "Transcription failed. Try again or type your idea." : msg);
     } finally {
       setIsTranscribing(false);
     }

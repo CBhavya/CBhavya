@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "VoicePrompt Studio",
-  description: "Multimodal prompt playground — record voice ideas, add context, generate content scripts with Gemini",
+  description: "Shoot planning for content creators — record ideas, get shot lists, camera angles, and production notes",
 };
 
 export default function RootLayout({
